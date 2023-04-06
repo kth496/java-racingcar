@@ -10,32 +10,41 @@ public class Main {
 
     private static GameParameter takeInput() {
         Scanner scanner = new Scanner(System.in);
+        return new GameParameter(takeCountOfCar(scanner), takeCountOfTry(scanner));
+    }
 
+    private static int takeCountOfCar(Scanner scanner) {
         UserView.showCarCountQuestion();
-        int countOfCar = Integer.parseInt(scanner.nextLine());
+        return Integer.parseInt(scanner.nextLine());
+    }
 
+    private static int takeCountOfTry(Scanner scanner) {
         UserView.showTryCountQuestion();
-        int countOfTry = Integer.parseInt(scanner.nextLine());
-
-        return new GameParameter(countOfCar, countOfTry);
+        return Integer.parseInt(scanner.nextLine());
     }
 
     private static void runGameWith(GameParameter gameParameter) {
         UserView.showResultMessageTitle();
-        Garage garage = new Garage();
+        Garage garage = Garage.init(gameParameter.getCountOfCar());
+        showGarageState(garage);
+        iterateEachGameStep(gameParameter, garage);
+    }
 
-        garage.createNewCars(gameParameter.getCountOfCar());
+    private static void showGarageState(Garage garage) {
+        System.out.println(garage + "\n");
+    }
 
-        garage.getAllCars().forEach((car) -> System.out.println(car.getPositionalString()));
-        System.out.println();
-
+    private static void iterateEachGameStep(GameParameter gameParameter, Garage garage) {
         for (int i = 0; i < gameParameter.getCountOfTry(); i++) {
-            garage.getAllCars().forEach((car) -> {
-                int value = RandomNumberGenerator.makeRandomNumber();
-                ControlCenter.moveCar(car, value);
-                System.out.println(car.getPositionalString());
-            });
-            System.out.println();
+            moveAllCarsIn(garage);
+            showGarageState(garage);
         }
+    }
+
+    private static void moveAllCarsIn(Garage garage) {
+        garage.getAllCars().forEach((car) -> {
+            int value = RandomNumberGenerator.makeRandomNumber();
+            ControlCenter.moveCar(car, value);
+        });
     }
 }
